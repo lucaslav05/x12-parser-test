@@ -1,7 +1,7 @@
 {
   "name": "x12-parser-test",
   "version": "1.0.0",
-  "description": "",
+  "description": "X12 EDI to JSON Parser",
   "homepage": "https://github.com/lucaslav05/x12-parser-test#readme",
   "bugs": {
     "url": "https://github.com/lucaslav05/x12-parser-test/issues"
@@ -13,11 +13,16 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "parser.js",
+  "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "build": "cd client && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
     "fs": "^0.0.1-security",
     "node-x12-edi": "^1.0.14"
   }

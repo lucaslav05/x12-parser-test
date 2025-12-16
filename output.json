@@ -1,7 +1,701 @@
 {
-  "transactionSet": "204",
-  "version": "004010",
-  "header": {},
-  "parties": [],
-  "stops": []
+  "envelope": {
+    "interchangeControlHeader": {
+      "authorizationQualifier": "00",
+      "authorizationInfo": "",
+      "securityQualifier": "00",
+      "securityInfo": "",
+      "senderIdQualifier": "ZZ",
+      "senderId": "MGECOLAB",
+      "receiverIdQualifier": "02",
+      "receiverId": "HFSE",
+      "date": "250715",
+      "time": "1143",
+      "standardsId": "U",
+      "version": "00401",
+      "controlNumber": "000000011",
+      "acknowledgmentRequested": "0",
+      "usageIndicator": "P"
+    },
+    "functionalGroupHeader": {
+      "functionalId": "SM",
+      "applicationSenderCode": "MGECOLAB",
+      "applicationReceiverCode": "HFSE",
+      "date": "20250715",
+      "time": "114332",
+      "groupControlNumber": "8",
+      "responsibleAgencyCode": "X",
+      "version": "004010"
+    },
+    "transactionSetHeader": {
+      "transactionSetId": "204",
+      "transactionSetControlNumber": "000080001"
+    }
+  },
+  "header": {
+    "shipmentInfo": {
+      "standardCarrierAlphaCode": "HFSE",
+      "shipmentId": "1020420118",
+      "shipmentMethodOfPayment": "PP"
+    },
+    "purposeCode": {
+      "transactionSetPurposeCode": "00",
+      "applicationTypeCode": "LT"
+    },
+    "references": [
+      {
+        "referenceId": "4516849016",
+        "referenceIdQualifier": "BM",
+        "description": "BOL Number"
+      },
+      {
+        "referenceId": "MO062525",
+        "referenceIdQualifier": "PO",
+        "description": "PO Number"
+      },
+      {
+        "referenceId": "00330362",
+        "referenceIdQualifier": "CN",
+        "description": "PRO"
+      },
+      {
+        "referenceId": "1020420118",
+        "referenceIdQualifier": "CN",
+        "description": "PRO"
+      },
+      {
+        "referenceId": "0021805807",
+        "referenceIdQualifier": "SI",
+        "description": "SAP Shipment Number"
+      },
+      {
+        "referenceId": "L1-10-H225",
+        "referenceIdQualifier": "SA",
+        "description": "Sales Align Code"
+      }
+    ],
+    "billOfLadingHandling": [
+      {
+        "specialHandlingCode": "HM"
+      },
+      {
+        "specialHandlingCode": "",
+        "specialServicesCode": "ID"
+      }
+    ]
+  },
+  "billTo": {
+    "entityIdCode": "BT",
+    "name": "ECOLAB INC",
+    "address": {
+      "addressLine1": "P.O. BOX 64371"
+    },
+    "location": {
+      "city": "ST. PAUL",
+      "state": "MN",
+      "postalCode": "551640371",
+      "country": "US"
+    }
+  },
+  "stops": [
+    {
+      "stopSequence": 1,
+      "stopReasonCode": "CL",
+      "stopType": "Pickup",
+      "references": [
+        {
+          "referenceId": "1020420118",
+          "referenceIdQualifier": "BM",
+          "description": "BOL"
+        },
+        {
+          "referenceId": "00330362",
+          "referenceIdQualifier": "CN",
+          "description": "PRO"
+        },
+        {
+          "referenceId": "4516849016",
+          "referenceIdQualifier": "CR",
+          "description": "BOL Number"
+        },
+        {
+          "referenceId": "0139255317",
+          "referenceIdQualifier": "OQ",
+          "description": "Order Number"
+        },
+        {
+          "referenceId": "MO062525",
+          "referenceIdQualifier": "PO",
+          "description": "PO Number"
+        },
+        {
+          "referenceId": "L1-10-H225",
+          "referenceIdQualifier": "CR",
+          "description": "Sales Align Code"
+        },
+        {
+          "referenceId": "0503618820",
+          "referenceIdQualifier": "CI",
+          "description": "CUSTOMERID"
+        },
+        {
+          "referenceId": "N",
+          "referenceIdQualifier": "CR",
+          "description": "FreezeProtect"
+        },
+        {
+          "referenceId": "000",
+          "referenceIdQualifier": "CR",
+          "description": "Appointment Required"
+        }
+      ],
+      "dates": [
+        {
+          "dateQualifier": "37",
+          "dateQualifierName": "Requested Ship Date",
+          "date": "2025-06-26",
+          "timeQualifier": "I",
+          "time": "17:00"
+        },
+        {
+          "dateQualifier": "38",
+          "dateQualifierName": "Requested Delivery Date",
+          "date": "2025-06-26",
+          "timeQualifier": "K",
+          "time": "17:00"
+        }
+      ],
+      "weight": {
+        "weightQualifier": "G",
+        "weightUnitCode": "L",
+        "weight": 523.84,
+        "ladingQuantity": 20
+      },
+      "location": {
+        "entityIdCode": "SH",
+        "name": "ECOLAB HONOLULU DC",
+        "idCodeQualifier": "93",
+        "idCode": "US33",
+        "address": {
+          "addressLine1": "933-A N. NIMITZ HWY",
+          "addressLine2": "C/O HFS Distribution Center-Hon"
+        },
+        "cityStateZip": {
+          "city": "HONOLULU",
+          "state": "HI",
+          "postalCode": "96817",
+          "country": "US"
+        }
+      },
+      "lineItems": [
+        {
+          "description": "SMRTPWR MANUAL DET 3X2LB",
+          "commodityCode": "0048580-000",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "BOX",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6101907",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 18.9,
+            "ladingQuantity": 3
+          },
+          "contact": {
+            "contactFunctionCode": "SH",
+            "name": "Ecolab",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "800-352-5326"
+          },
+          "references": [
+            {
+              "referenceId": "070.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ]
+        },
+        {
+          "description": "OASIS 146 MULTI QUAT2.5GL",
+          "commodityCode": "0048580-000",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "BOX",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6100536",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 175.21,
+            "ladingQuantity": 8
+          },
+          "contact": {
+            "contactFunctionCode": "SH",
+            "name": "Ecolab",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "800-352-5326"
+          },
+          "references": [
+            {
+              "referenceId": "070.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ]
+        },
+        {
+          "description": "ADV NEXA AB FOAM HAND 6X750",
+          "commodityCode": "0048580-000",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "BOX",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6101090",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 22.84,
+            "ladingQuantity": 2
+          },
+          "contact": {
+            "contactFunctionCode": "SH",
+            "name": "Ecolab",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "800-352-5326"
+          },
+          "references": [
+            {
+              "referenceId": "070.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ]
+        },
+        {
+          "description": "LIME-A-WAY_4-1 GAL",
+          "commodityCode": "0044155-003",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "BOX",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6101131",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 151.6,
+            "ladingQuantity": 4
+          },
+          "contact": {
+            "contactFunctionCode": "HM",
+            "name": "CHEMTREC",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "1-800-424-9300"
+          },
+          "references": [
+            {
+              "referenceId": "085.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ],
+          "hazardousMaterial": {
+            "unitOrBasisForMeasurementCode": "LB",
+            "ladingQuantity": 152,
+            "unOrNaIdNumber": "UN3264",
+            "packingGroupCode": "II",
+            "hazardousClass": "8",
+            "properShippingName": "Corrosive liquid, acidic,",
+            "hazardousClassQualifier": "D",
+            "nosIndicator": "NOS",
+            "hazardousMaterialDescription": {
+              "hazardousCode": "ADI",
+              "hazardousDescription": "(Nitric acid, citric acid"
+            }
+          }
+        },
+        {
+          "description": "TP DM DET ALL PRPS 5 GAL",
+          "commodityCode": "0044155-003",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "PAL",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6112716",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 113.8,
+            "ladingQuantity": 2
+          },
+          "contact": {
+            "contactFunctionCode": "HM",
+            "name": "CHEMTREC",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "1-800-424-9300"
+          },
+          "references": [
+            {
+              "referenceId": "085.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ],
+          "hazardousMaterial": {
+            "unitOrBasisForMeasurementCode": "LB",
+            "ladingQuantity": 114,
+            "unOrNaIdNumber": "UN1824",
+            "packingGroupCode": "II",
+            "hazardousClass": "8",
+            "properShippingName": "Sodium hydroxide solution",
+            "hazardousClassQualifier": "D",
+            "hazardousMaterialDescription": null
+          }
+        },
+        {
+          "description": "TP DM RNS ADD AP 4.5 GAL",
+          "commodityCode": "0048580-000",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "PAL",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6115172",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 41.5,
+            "ladingQuantity": 1
+          },
+          "contact": {
+            "contactFunctionCode": "SH",
+            "name": "Ecolab",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "800-352-5326"
+          },
+          "references": [
+            {
+              "referenceId": "070.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stopSequence": 2,
+      "stopReasonCode": "CU",
+      "stopType": "Delivery",
+      "references": [
+        {
+          "referenceId": "1020420118",
+          "referenceIdQualifier": "BM",
+          "description": "BOL"
+        },
+        {
+          "referenceId": "00330362",
+          "referenceIdQualifier": "CN",
+          "description": "PRO"
+        },
+        {
+          "referenceId": "4516849016",
+          "referenceIdQualifier": "CR",
+          "description": "BOL Number"
+        },
+        {
+          "referenceId": "0139255317",
+          "referenceIdQualifier": "OQ",
+          "description": "Order Number"
+        },
+        {
+          "referenceId": "MO062525",
+          "referenceIdQualifier": "PO",
+          "description": "PO Number"
+        },
+        {
+          "referenceId": "L1-10-H225",
+          "referenceIdQualifier": "CR",
+          "description": "Sales Align Code"
+        },
+        {
+          "referenceId": "0503618820",
+          "referenceIdQualifier": "CI",
+          "description": "CUSTOMERID"
+        },
+        {
+          "referenceId": "N",
+          "referenceIdQualifier": "CR",
+          "description": "FreezeProtect"
+        },
+        {
+          "referenceId": "000",
+          "referenceIdQualifier": "CR",
+          "description": "Appointment Required"
+        }
+      ],
+      "dates": [
+        {
+          "dateQualifier": "53",
+          "dateQualifierName": "Delivered Date",
+          "date": "2025-07-02",
+          "timeQualifier": "G",
+          "time": "08:00"
+        },
+        {
+          "dateQualifier": "54",
+          "dateQualifierName": "Last Delivery Date",
+          "date": "2025-07-02",
+          "timeQualifier": "L",
+          "time": "23:59"
+        }
+      ],
+      "weight": {
+        "weightQualifier": "G",
+        "weightUnitCode": "L",
+        "weight": 523.84,
+        "ladingQuantity": 20
+      },
+      "location": {
+        "entityIdCode": "CN",
+        "name": "LANAKILA KITCHEN",
+        "address": {
+          "addressLine1": "1809 BACHELOT ST"
+        },
+        "cityStateZip": {
+          "city": "HONOLULU",
+          "state": "HI",
+          "postalCode": "96817",
+          "country": "US"
+        }
+      },
+      "lineItems": [
+        {
+          "description": "SMRTPWR MANUAL DET 3X2LB",
+          "commodityCode": "0048580-000",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "BOX",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6101907",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 18.9,
+            "ladingQuantity": 3
+          },
+          "contact": {
+            "contactFunctionCode": "SH",
+            "name": "Ecolab",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "800-352-5326"
+          },
+          "references": [
+            {
+              "referenceId": "070.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ]
+        },
+        {
+          "description": "OASIS 146 MULTI QUAT2.5GL",
+          "commodityCode": "0048580-000",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "BOX",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6100536",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 175.21,
+            "ladingQuantity": 8
+          },
+          "contact": {
+            "contactFunctionCode": "SH",
+            "name": "Ecolab",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "800-352-5326"
+          },
+          "references": [
+            {
+              "referenceId": "070.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ]
+        },
+        {
+          "description": "ADV NEXA AB FOAM HAND 6X750",
+          "commodityCode": "0048580-000",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "BOX",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6101090",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 22.84,
+            "ladingQuantity": 2
+          },
+          "contact": {
+            "contactFunctionCode": "SH",
+            "name": "Ecolab",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "800-352-5326"
+          },
+          "references": [
+            {
+              "referenceId": "070.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ]
+        },
+        {
+          "description": "LIME-A-WAY_4-1 GAL",
+          "commodityCode": "0044155-003",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "BOX",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6101131",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 151.6,
+            "ladingQuantity": 4
+          },
+          "contact": {
+            "contactFunctionCode": "HM",
+            "name": "CHEMTREC",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "1-800-424-9300"
+          },
+          "references": [
+            {
+              "referenceId": "085.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ],
+          "hazardousMaterial": {
+            "unitOrBasisForMeasurementCode": "LB",
+            "ladingQuantity": 152,
+            "unOrNaIdNumber": "UN3264",
+            "packingGroupCode": "II",
+            "hazardousClass": "8",
+            "properShippingName": "Corrosive liquid, acidic,",
+            "hazardousClassQualifier": "D",
+            "nosIndicator": "NOS",
+            "hazardousMaterialDescription": {
+              "hazardousCode": "ADI",
+              "hazardousDescription": "(Nitric acid, citric acid"
+            }
+          }
+        },
+        {
+          "description": "TP DM DET ALL PRPS 5 GAL",
+          "commodityCode": "0044155-003",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "PAL",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6112716",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 113.8,
+            "ladingQuantity": 2
+          },
+          "contact": {
+            "contactFunctionCode": "HM",
+            "name": "CHEMTREC",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "1-800-424-9300"
+          },
+          "references": [
+            {
+              "referenceId": "085.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ],
+          "hazardousMaterial": {
+            "unitOrBasisForMeasurementCode": "LB",
+            "ladingQuantity": 114,
+            "unOrNaIdNumber": "UN1824",
+            "packingGroupCode": "II",
+            "hazardousClass": "8",
+            "properShippingName": "Sodium hydroxide solution",
+            "hazardousClassQualifier": "D",
+            "hazardousMaterialDescription": null
+          }
+        },
+        {
+          "description": "TP DM RNS ADD AP 4.5 GAL",
+          "commodityCode": "0048580-000",
+          "commodityCodeQualifier": "N",
+          "packagingCode": "PAL",
+          "ladingDescription": "4516849016",
+          "weightQualifier": "SI",
+          "hazardousMaterialCode": "Z",
+          "nmfcCode": "6115172",
+          "weight": {
+            "weightQualifier": "G",
+            "weightUnitCode": "L",
+            "weight": 41.5,
+            "ladingQuantity": 1
+          },
+          "contact": {
+            "contactFunctionCode": "SH",
+            "name": "Ecolab",
+            "communicationNumberQualifier": "TE",
+            "communicationNumber": "800-352-5326"
+          },
+          "references": [
+            {
+              "referenceId": "070.0",
+              "referenceIdQualifier": "ZZ",
+              "description": "Freight Class"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "weight": 523.84,
+    "weightQualifier": "G",
+    "freightRate": 83.51,
+    "rateValueQualifier": "FR",
+    "charge": 8351,
+    "ladingQuantity": 20
+  },
+  "trailer": {
+    "transactionSetTrailer": {
+      "numberOfIncludedSegments": 110,
+      "transactionSetControlNumber": "000080001"
+    },
+    "functionalGroupTrailer": {
+      "numberOfTransactionSets": 1,
+      "groupControlNumber": "8"
+    },
+    "interchangeControlTrailer": {
+      "numberOfIncludedFunctionalGroups": 1,
+      "interchangeControlNumber": "000000011"
+    }
+  }
 }
