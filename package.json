@@ -15,7 +15,8 @@
   "type": "module",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js",
+    "build": "vite build",
+    "start": "npm run build && vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
