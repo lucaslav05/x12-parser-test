@@ -2,28 +2,31 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import { Transaction } from "node-x12-edi";
+
+import { parseEDI } from "../src/ediParser.js";
 import {
   getTemplate,
   getAvailableTemplates,
   hasTemplate
 } from "../src/templates/index.js";
 
-/* -------------------- setup -------------------- */
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-/* -------------------- middleware -------------------- */
+/* -------------------- paths (ESM-safe) -------------------- */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const CLIENT_DIR = path.join(__dirname, "../client");
 
+/* -------------------- middleware -------------------- */
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.text({ limit: "10mb" }));
 
-/* -------------------- API routes -------------------- */
+/* 🔹 serve frontend */
+app.use(express.static(CLIENT_DIR));
+
+/* -------------------- api routes -------------------- */
 
 app.get("/api/health", (req, res) => {
   res.json({
@@ -38,78 +41,84 @@ app.get("/api/templates", (req, res) => {
   });
 });
 
-app.post("/api/parse", async (req, res) => {
+app.post("/api/parse", (req, res) => {
   try {
-    const ediContent = typeof req.body === "string" ? req.body : req.body?.edi;
+    const ediContent =
+      typeof req.body === "string" ? req.body : req.body?.edi;
+
     const requestedType = req.body?.type;
 
-    if (!ediContent || !ediContent.includes("ISA")) {
+    if (!ediContent || typeof ediContent !== "string") {
       return res.status(400).json({
-        error: "Invalid EDI content",
-        message: "EDI must contain an ISA segment"
+        error: "Invalid input",
+        message: "Provide EDI content as raw text or { edi: string }"
       });
     }
 
-    // 1) create the Transaction instance
-    const transaction = new Transaction();
+    if (!ediContent.includes("ISA")) {
+      return res.status(400).json({
+        error: "Invalid EDI format",
+        message: "EDI content must contain an ISA segment"
+      });
+    }
 
-    // 2) generate segments from raw content
-    transaction.generateSegments(ediContent);
-
-    // 3) finalize loops so loop maps work correctly
-    transaction.runLoops();
-
-    // 4) determine type
-    const detectedType = transaction.getTransactionSetId?.() || transaction.header?.ST?.transactionSetId;
+    const parsedEDI = parseEDI(ediContent);
+    const detectedType = parsedEDI.getTransactionSetId();
     const transactionType = requestedType || detectedType;
 
     if (!transactionType) {
       return res.status(400).json({
-        error: "Unable to determine EDI type"
+        error: "Unable to determine EDI type",
+        message: "Could not detect transaction set from ST segment"
       });
     }
 
     if (!hasTemplate(transactionType)) {
       return res.status(400).json({
         error: "Unsupported EDI type",
+        message: `No template available for transaction set: ${transactionType}`,
         detectedType,
-        availableTypes: getAvailableTemplates().map(t => t.transactionSet)
+        availableTypes: getAvailableTemplates().map(t => t.id)
       });
     }
 
     const template = getTemplate(transactionType);
-
-    // 5) map segments to JSON using your JSON template
-    const data = transaction.mapSegments(template);
+    const result = template.parse(parsedEDI);
 
     res.json({
       success: true,
       detectedType,
       usedType: transactionType,
-      data
+      segmentCount: parsedEDI.segments.length,
+      data: result
     });
-  } catch (err) {
-    console.error("Parse error:", err);
+  } catch (error) {
+    console.error("Parse error:", error);
     res.status(500).json({
       error: "Parse error",
-      message: err.message
+      message: error.message
     });
   }
 });
 
-/* -------------------- frontend -------------------- */
-/* Serve Vite build output */
+app.post("/api/build", (req, res) => {
+  const { type, data, meta } = req.body;
 
-const distPath = path.join(__dirname, "../dist");
-app.use(express.static(distPath));
+  if (!hasTemplate(type)) {
+    return res.status(400).json({ error: "Unsupported type" });
+  }
 
-/* Catch-all: send index.html for browser routes */
+  const edi = getTemplate(type).build(data, meta);
+  res.json({ edi });
+});
+
+/* 🔹 browser fallback (optional but recommended) */
 app.get("*", (req, res) => {
-  res.sendFile(path.join(distPath, "index.html"));
+  res.sendFile(path.join(CLIENT_DIR, "index.html"));
 });
 
 /* -------------------- start server -------------------- */
 
 app.listen(PORT, () => {
-  console.log(`EDI Parser running at http://localhost:${PORT}`);
+  console.log(`EDI Parser API running on http://localhost:${PORT}`);
 });
