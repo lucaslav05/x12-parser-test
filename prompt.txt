@@ -1,0 +1,7 @@
+Please don't make any changes, just let me know what the plan is.
+
+
+Please make sure this is a direct and targeted fix. 
+Also please add what was changed to a new Mark Down file in the local md directory.
+Please start the name of the Mark Down file with the date, followed by a brief description.
+The year is 2025.

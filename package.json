@@ -11,7 +11,7 @@
   "type": "module",
   "main": "server/index.js",
   "scripts": {
-    "dev": "concurrently \"node server/index.js\" \"vite\"",
+    "dev": "npm run build && npm start",
     "build": "vite build",
     "start": "node server/index.js"
   },
