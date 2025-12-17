@@ -1,9 +1,15 @@
-import express from 'express';
-import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { parseEDI } from '../src/ediParser.js';
-import { getTemplate, getAvailableTemplates, hasTemplate } from '../src/templates/index.js';
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import { Transaction } from "node-x12-edi";
+import {
+  getTemplate,
+  getAvailableTemplates,
+  hasTemplate
+} from "../src/templates/index.js";
+
+/* -------------------- setup -------------------- */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,82 +17,99 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.text({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, '../client/dist')));
+/* -------------------- middleware -------------------- */
 
-app.get('/api/templates', (req, res) => {
-  const templates = getAvailableTemplates();
-  res.json({ templates });
+app.use(cors());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.text({ limit: "10mb" }));
+
+/* -------------------- API routes -------------------- */
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString()
+  });
 });
 
-app.post('/api/parse', (req, res) => {
+app.get("/api/templates", (req, res) => {
+  res.json({
+    templates: getAvailableTemplates()
+  });
+});
+
+app.post("/api/parse", async (req, res) => {
   try {
-    const ediContent = typeof req.body === 'string' ? req.body : req.body.edi;
-    const requestedType = req.body.type;
+    const ediContent = typeof req.body === "string" ? req.body : req.body?.edi;
+    const requestedType = req.body?.type;
 
-    if (!ediContent || typeof ediContent !== 'string') {
+    if (!ediContent || !ediContent.includes("ISA")) {
       return res.status(400).json({
-        error: 'Invalid input',
-        message: 'Please provide EDI content in the request body'
+        error: "Invalid EDI content",
+        message: "EDI must contain an ISA segment"
       });
     }
 
-    if (!ediContent.includes('ISA')) {
-      return res.status(400).json({
-        error: 'Invalid EDI format',
-        message: 'EDI content must contain an ISA segment'
-      });
-    }
+    // 1) create the Transaction instance
+    const transaction = new Transaction();
 
-    const parsedEDI = parseEDI(ediContent);
-    const detectedType = parsedEDI.getTransactionSetId();
+    // 2) generate segments from raw content
+    transaction.generateSegments(ediContent);
+
+    // 3) finalize loops so loop maps work correctly
+    transaction.runLoops();
+
+    // 4) determine type
+    const detectedType = transaction.getTransactionSetId?.() || transaction.header?.ST?.transactionSetId;
     const transactionType = requestedType || detectedType;
 
     if (!transactionType) {
       return res.status(400).json({
-        error: 'Unable to determine EDI type',
-        message: 'Could not detect transaction set type from ST segment'
+        error: "Unable to determine EDI type"
       });
     }
 
     if (!hasTemplate(transactionType)) {
       return res.status(400).json({
-        error: 'Unsupported EDI type',
-        message: `No template available for transaction set type: ${transactionType}`,
+        error: "Unsupported EDI type",
         detectedType,
-        availableTypes: getAvailableTemplates().map(t => t.id)
+        availableTypes: getAvailableTemplates().map(t => t.transactionSet)
       });
     }
 
     const template = getTemplate(transactionType);
-    const result = template.parse(parsedEDI);
+
+    // 5) map segments to JSON using your JSON template
+    const data = transaction.mapSegments(template);
 
     res.json({
       success: true,
       detectedType,
       usedType: transactionType,
-      segmentCount: parsedEDI.segments.length,
-      data: result
+      data
     });
-  } catch (error) {
-    console.error('Parse error:', error);
+  } catch (err) {
+    console.error("Parse error:", err);
     res.status(500).json({
-      error: 'Parse error',
-      message: error.message
+      error: "Parse error",
+      message: err.message
     });
   }
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+/* -------------------- frontend -------------------- */
+/* Serve Vite build output */
+
+const distPath = path.join(__dirname, "../dist");
+app.use(express.static(distPath));
+
+/* Catch-all: send index.html for browser routes */
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-});
+/* -------------------- start server -------------------- */
 
 app.listen(PORT, () => {
-  console.log(`EDI Parser server running on port ${PORT}`);
+  console.log(`EDI Parser running at http://localhost:${PORT}`);
 });

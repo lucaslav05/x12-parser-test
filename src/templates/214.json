@@ -1,0 +1,28 @@
+{
+  "transactionSet": "214",
+  "version": "004010",
+  "header": {
+    "shipmentId": { "_type": "FieldMap", "segmentIdentifier": "B10", "valuePosition": 2 },
+    "carrierId": { "_type": "FieldMap", "segmentIdentifier": "B10", "valuePosition": 3 }
+  },
+  "stops": {
+    "_type": "LoopMap",
+    "loopIdentifier": "LX",
+    "events": {
+      "_type": "LoopMap",
+      "loopIdentifier": "AT7",
+      "fields": {
+        "statusCode": { "_type": "FieldMap", "segmentIdentifier": "AT7", "valuePosition": 1 },
+        "date": { "_type": "FieldMap", "segmentIdentifier": "AT7", "valuePosition": 2 },
+        "time": { "_type": "FieldMap", "segmentIdentifier": "AT7", "valuePosition": 3 }
+      }
+    },
+    "references": {
+      "_type": "LoopMap",
+      "loopIdentifier": "L11",
+      "fields": {
+        "referenceId": { "_type": "FieldMap", "segmentIdentifier": "L11", "valuePosition": 1 }
+      }
+    }
+  }
+}

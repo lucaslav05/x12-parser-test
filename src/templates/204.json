@@ -1,0 +1,31 @@
+{
+  "transactionSet": "204",
+  "version": "004010",
+  "header": {
+    "shipmentId": { "_type": "FieldMap", "segmentIdentifier": "B2", "valuePosition": 3 },
+    "shipmentMethod": { "_type": "FieldMap", "segmentIdentifier": "B2", "valuePosition": 5 },
+    "purposeCode": { "_type": "FieldMap", "segmentIdentifier": "B2A", "valuePosition": 1 }
+  },
+  "billTo": {
+    "name": { "_type": "FieldMap", "segmentIdentifier": "N1", "valuePosition": 2, "qualifier": "BT" },
+    "address": { "_type": "FieldMap", "segmentIdentifier": "N3", "valuePosition": 1 },
+    "location": {
+      "city": { "_type": "FieldMap", "segmentIdentifier": "N4", "valuePosition": 1 },
+      "state": { "_type": "FieldMap", "segmentIdentifier": "N4", "valuePosition": 2 },
+      "postalCode": { "_type": "FieldMap", "segmentIdentifier": "N4", "valuePosition": 3 },
+      "country": { "_type": "FieldMap", "segmentIdentifier": "N4", "valuePosition": 4 }
+    }
+  },
+  "stops": {
+    "_type": "LoopMap",
+    "loopIdentifier": "S5",
+    "lineItems": {
+      "_type": "LoopMap",
+      "loopIdentifier": "L5",
+      "fields": {
+        "description": { "_type": "FieldMap", "segmentIdentifier": "L5", "valuePosition": 2 },
+        "commodityCode": { "_type": "FieldMap", "segmentIdentifier": "L5", "valuePosition": 3 }
+      }
+    }
+  }
+}

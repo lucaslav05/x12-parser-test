@@ -2,10 +2,6 @@
   "name": "x12-parser-test",
   "version": "1.0.0",
   "description": "EDI X12 to JSON Converter",
-  "homepage": "https://github.com/lucaslav05/x12-parser-test#readme",
-  "bugs": {
-    "url": "https://github.com/lucaslav05/x12-parser-test/issues"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lucaslav05/x12-parser-test.git"
@@ -15,13 +11,16 @@
   "type": "module",
   "main": "server/index.js",
   "scripts": {
+    "dev": "concurrently \"node server/index.js\" \"vite\"",
     "build": "vite build",
-    "start": "npm run build && vite preview",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "node-x12-edi": "^1.0.14"
+  },
+  "devDependencies": {
+    "vite": "^7.3.0"
   }
 }
