@@ -103,7 +103,7 @@ app.post("/api/parse", (req, res) => {
 
 app.post("/api/build", (req, res) => {
   try {
-    const { type, data, meta } = req.body;
+    let { type, data, meta } = req.body;
 
     if (!type) {
       return res.status(400).json({
@@ -117,6 +117,10 @@ app.post("/api/build", (req, res) => {
         error: "Missing data",
         message: "JSON data is required for building EDI"
       });
+    }
+
+    if (data.data) {
+      data = data.data;
     }
 
     if (!hasTemplate(type)) {
