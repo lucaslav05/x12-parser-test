@@ -102,14 +102,54 @@ app.post("/api/parse", (req, res) => {
 });
 
 app.post("/api/build", (req, res) => {
-  const { type, data, meta } = req.body;
+  try {
+    const { type, data, meta } = req.body;
 
-  if (!hasTemplate(type)) {
-    return res.status(400).json({ error: "Unsupported type" });
+    if (!type) {
+      return res.status(400).json({
+        error: "Missing type",
+        message: "Transaction type is required for building EDI"
+      });
+    }
+
+    if (!data) {
+      return res.status(400).json({
+        error: "Missing data",
+        message: "JSON data is required for building EDI"
+      });
+    }
+
+    if (!hasTemplate(type)) {
+      return res.status(400).json({
+        error: "Unsupported type",
+        message: `No template available for type: ${type}`,
+        availableTypes: getAvailableTemplates().map(t => t.id)
+      });
+    }
+
+    const template = getTemplate(type);
+
+    if (!template.build) {
+      return res.status(500).json({
+        error: "Build not implemented",
+        message: `Template ${type} does not support building EDI from JSON`
+      });
+    }
+
+    const edi = template.build(data, meta);
+
+    res.json({
+      success: true,
+      type,
+      edi
+    });
+  } catch (error) {
+    console.error("Build error:", error);
+    res.status(500).json({
+      error: "Build error",
+      message: error.message
+    });
   }
-
-  const edi = getTemplate(type).build(data, meta);
-  res.json({ edi });
 });
 
 /* 🔹 browser fallback (optional but recommended) */

@@ -4,8 +4,20 @@ import {
   getDateQualifierName,
   trimField,
   parseNumber,
-  parseInteger
+  parseInteger,
+  unformatDate,
+  unformatTime
 } from '../utils.js';
+import {
+  buildSegment,
+  buildISA,
+  buildGS,
+  buildST,
+  buildSE,
+  buildGE,
+  buildIEA,
+  assembleEDI
+} from '../ediWriter.js';
 
 export const transactionSetId = '214';
 export const name = 'Transportation Carrier Shipment Status';
@@ -176,4 +188,147 @@ function parseTrailer(parsedEDI) {
       interchangeControlNumber: trimField(iea.elements[1])
     } : null
   };
+}
+
+export function build(jsonData, meta = {}) {
+  const fieldDelimiter = meta.fieldDelimiter || '*';
+  const segmentDelimiter = meta.segmentDelimiter || '~';
+
+  const segments = [];
+  const bodySegments = [];
+
+  segments.push(buildISA(jsonData.envelope, fieldDelimiter, segmentDelimiter));
+  segments.push(buildGS(jsonData.envelope, fieldDelimiter));
+  segments.push(buildST(jsonData.envelope, fieldDelimiter));
+
+  if (jsonData.header) {
+    const b10Seg = buildB10(jsonData.header, fieldDelimiter);
+    if (b10Seg) bodySegments.push(b10Seg);
+
+    if (jsonData.header.references) {
+      jsonData.header.references.forEach(ref => {
+        const l11Seg = buildL11(ref, fieldDelimiter);
+        if (l11Seg) bodySegments.push(l11Seg);
+      });
+    }
+
+    if (jsonData.header.statusHandling) {
+      jsonData.header.statusHandling.forEach(at => {
+        const at5Seg = buildAT5(at, fieldDelimiter);
+        if (at5Seg) bodySegments.push(at5Seg);
+      });
+    }
+  }
+
+  if (jsonData.shipment) {
+    jsonData.shipment.forEach(entity => {
+      const n1Seg = buildN1(entity, fieldDelimiter);
+      if (n1Seg) bodySegments.push(n1Seg);
+
+      if (entity.address) {
+        const n3Seg = buildN3(entity.address, fieldDelimiter);
+        if (n3Seg) bodySegments.push(n3Seg);
+      }
+
+      if (entity.location) {
+        const n4Seg = buildN4(entity.location, fieldDelimiter);
+        if (n4Seg) bodySegments.push(n4Seg);
+      }
+    });
+  }
+
+  if (jsonData.stops) {
+    jsonData.stops.forEach(stop => {
+      const stopSegs = buildStop(stop, fieldDelimiter);
+      bodySegments.push(...stopSegs);
+    });
+  }
+
+  segments.push(...bodySegments);
+
+  const segmentCount = bodySegments.length + 1;
+  segments.push(buildSE(segmentCount, jsonData.envelope, fieldDelimiter));
+  segments.push(buildGE(1, jsonData.envelope, fieldDelimiter));
+  segments.push(buildIEA(1, jsonData.envelope, fieldDelimiter));
+
+  return assembleEDI(segments, segmentDelimiter);
+}
+
+function buildB10(header, fieldDelimiter) {
+  if (!header.shipmentInfo) return null;
+  const info = header.shipmentInfo;
+  return buildSegment('B10', [
+    '',
+    info.shipmentId || '',
+    info.carrierId || '',
+    info.shipmentMethod || ''
+  ], fieldDelimiter);
+}
+
+function buildL11(ref, fieldDelimiter) {
+  return buildSegment('L11', [
+    ref.referenceId || '',
+    ref.referenceIdQualifier || '',
+    ref.description || ''
+  ], fieldDelimiter);
+}
+
+function buildAT5(at, fieldDelimiter) {
+  return buildSegment('AT5', [
+    at.specialHandlingCode || '',
+    at.specialServicesCode || ''
+  ], fieldDelimiter);
+}
+
+function buildN1(entity, fieldDelimiter) {
+  return buildSegment('N1', [
+    entity.entityIdCode || '',
+    entity.name || ''
+  ], fieldDelimiter);
+}
+
+function buildN3(address, fieldDelimiter) {
+  return buildSegment('N3', [
+    address.addressLine1 || '',
+    address.addressLine2 || ''
+  ], fieldDelimiter);
+}
+
+function buildN4(location, fieldDelimiter) {
+  return buildSegment('N4', [
+    location.city || '',
+    location.state || '',
+    location.postalCode || '',
+    location.country || ''
+  ], fieldDelimiter);
+}
+
+function buildStop(stop, fieldDelimiter) {
+  const segments = [];
+
+  const lxSeg = buildSegment('LX', [
+    stop.stopNumber || ''
+  ], fieldDelimiter);
+  segments.push(lxSeg);
+
+  if (stop.events) {
+    stop.events.forEach(event => {
+      const at7Seg = buildSegment('AT7', [
+        event.statusCode || '',
+        unformatDate(event.date) || '',
+        unformatTime(event.time) || '',
+        event.weight || ''
+      ], fieldDelimiter);
+      segments.push(at7Seg);
+    });
+  }
+
+  if (stop.references) {
+    stop.references.forEach(ref => {
+      const l11Seg = buildL11(ref, fieldDelimiter);
+      if (l11Seg) segments.push(l11Seg);
+    });
+  }
+
+  return segments;
 }

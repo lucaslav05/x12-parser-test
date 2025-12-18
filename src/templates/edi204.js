@@ -5,8 +5,23 @@ import {
   getStopType,
   trimField,
   parseNumber,
-  parseInteger
+  parseInteger,
+  unformatDate,
+  unformatTime,
+  getDateQualifierCode,
+  getStopReasonCode,
+  getEntityIdCode
 } from '../utils.js';
+import {
+  buildSegment,
+  buildISA,
+  buildGS,
+  buildST,
+  buildSE,
+  buildGE,
+  buildIEA,
+  assembleEDI
+} from '../ediWriter.js';
 
 export const transactionSetId = '204';
 export const name = 'Motor Carrier Load Tender';
@@ -441,4 +456,300 @@ function parseTrailer(parsedEDI) {
       interchangeControlNumber: trimField(iea.elements[1])
     } : null
   };
+}
+
+export function build(jsonData, meta = {}) {
+  const fieldDelimiter = meta.fieldDelimiter || '*';
+  const segmentDelimiter = meta.segmentDelimiter || '~';
+
+  const segments = [];
+  const bodySegments = [];
+
+  segments.push(buildISA(jsonData.envelope, fieldDelimiter, segmentDelimiter));
+  segments.push(buildGS(jsonData.envelope, fieldDelimiter));
+  segments.push(buildST(jsonData.envelope, fieldDelimiter));
+
+  if (jsonData.header) {
+    const b2Seg = buildB2(jsonData.header, fieldDelimiter);
+    if (b2Seg) bodySegments.push(b2Seg);
+
+    const b2aSeg = buildB2A(jsonData.header, fieldDelimiter);
+    if (b2aSeg) bodySegments.push(b2aSeg);
+
+    if (jsonData.header.references) {
+      jsonData.header.references.forEach(ref => {
+        const l11Seg = buildL11(ref, fieldDelimiter);
+        if (l11Seg) bodySegments.push(l11Seg);
+      });
+    }
+
+    if (jsonData.header.billOfLadingHandling) {
+      jsonData.header.billOfLadingHandling.forEach(at => {
+        const at5Seg = buildAT5(at, fieldDelimiter);
+        if (at5Seg) bodySegments.push(at5Seg);
+      });
+    }
+  }
+
+  if (jsonData.billTo) {
+    const n1Seg = buildN1(jsonData.billTo, fieldDelimiter);
+    if (n1Seg) bodySegments.push(n1Seg);
+
+    if (jsonData.billTo.address) {
+      const n3Seg = buildN3(jsonData.billTo.address, fieldDelimiter);
+      if (n3Seg) bodySegments.push(n3Seg);
+    }
+
+    if (jsonData.billTo.location) {
+      const n4Seg = buildN4(jsonData.billTo.location, fieldDelimiter);
+      if (n4Seg) bodySegments.push(n4Seg);
+    }
+  }
+
+  if (jsonData.stops) {
+    jsonData.stops.forEach(stop => {
+      const stopSegs = buildStop(stop, fieldDelimiter);
+      bodySegments.push(...stopSegs);
+    });
+  }
+
+  if (jsonData.totals) {
+    const l3Seg = buildL3(jsonData.totals, fieldDelimiter);
+    if (l3Seg) bodySegments.push(l3Seg);
+  }
+
+  segments.push(...bodySegments);
+
+  const segmentCount = bodySegments.length + 1;
+  segments.push(buildSE(segmentCount, jsonData.envelope, fieldDelimiter));
+  segments.push(buildGE(1, jsonData.envelope, fieldDelimiter));
+  segments.push(buildIEA(1, jsonData.envelope, fieldDelimiter));
+
+  return assembleEDI(segments, segmentDelimiter);
+}
+
+function buildB2(header, fieldDelimiter) {
+  if (!header.shipmentInfo) return null;
+  const info = header.shipmentInfo;
+  return buildSegment('B2', [
+    '',
+    info.standardCarrierAlphaCode || '',
+    '',
+    info.shipmentId || '',
+    '',
+    info.shipmentMethodOfPayment || ''
+  ], fieldDelimiter);
+}
+
+function buildB2A(header, fieldDelimiter) {
+  if (!header.purposeCode) return null;
+  const pc = header.purposeCode;
+  return buildSegment('B2A', [
+    pc.transactionSetPurposeCode || '',
+    pc.applicationTypeCode || ''
+  ], fieldDelimiter);
+}
+
+function buildL11(ref, fieldDelimiter) {
+  return buildSegment('L11', [
+    ref.referenceId || '',
+    ref.referenceIdQualifier || '',
+    ref.description || ''
+  ], fieldDelimiter);
+}
+
+function buildAT5(at, fieldDelimiter) {
+  return buildSegment('AT5', [
+    at.specialHandlingCode || '',
+    at.specialServicesCode || ''
+  ], fieldDelimiter);
+}
+
+function buildN1(entity, fieldDelimiter) {
+  return buildSegment('N1', [
+    entity.entityIdCode || '',
+    entity.name || '',
+    entity.idCodeQualifier || '',
+    entity.idCode || ''
+  ], fieldDelimiter);
+}
+
+function buildN3(address, fieldDelimiter) {
+  return buildSegment('N3', [
+    address.addressLine1 || '',
+    address.addressLine2 || ''
+  ], fieldDelimiter);
+}
+
+function buildN4(location, fieldDelimiter) {
+  return buildSegment('N4', [
+    location.city || '',
+    location.state || '',
+    location.postalCode || '',
+    location.country || ''
+  ], fieldDelimiter);
+}
+
+function buildStop(stop, fieldDelimiter) {
+  const segments = [];
+
+  const s5Seg = buildSegment('S5', [
+    stop.stopSequence || '',
+    stop.stopReasonCode || getStopReasonCode(stop.stopType) || ''
+  ], fieldDelimiter);
+  segments.push(s5Seg);
+
+  if (stop.references) {
+    stop.references.forEach(ref => {
+      const l11Seg = buildL11(ref, fieldDelimiter);
+      if (l11Seg) segments.push(l11Seg);
+    });
+  }
+
+  if (stop.dates) {
+    stop.dates.forEach(date => {
+      const g62Seg = buildSegment('G62', [
+        date.dateQualifier || getDateQualifierCode(date.dateQualifierName) || '',
+        unformatDate(date.date) || '',
+        date.timeQualifier || '',
+        unformatTime(date.time) || ''
+      ], fieldDelimiter);
+      segments.push(g62Seg);
+    });
+  }
+
+  if (stop.weight) {
+    const at8Seg = buildSegment('AT8', [
+      stop.weight.weightQualifier || '',
+      stop.weight.weightUnitCode || '',
+      stop.weight.weight || '',
+      '',
+      stop.weight.ladingQuantity || ''
+    ], fieldDelimiter);
+    segments.push(at8Seg);
+  }
+
+  if (stop.location) {
+    const n1Seg = buildN1(stop.location, fieldDelimiter);
+    if (n1Seg) segments.push(n1Seg);
+
+    if (stop.location.address) {
+      const n3Seg = buildN3(stop.location.address, fieldDelimiter);
+      if (n3Seg) segments.push(n3Seg);
+    }
+
+    if (stop.location.cityStateZip) {
+      const n4Seg = buildSegment('N4', [
+        stop.location.cityStateZip.city || '',
+        stop.location.cityStateZip.state || '',
+        stop.location.cityStateZip.postalCode || '',
+        stop.location.cityStateZip.country || ''
+      ], fieldDelimiter);
+      segments.push(n4Seg);
+    }
+  }
+
+  if (stop.lineItems) {
+    stop.lineItems.forEach(item => {
+      const lineSegs = buildLineItem(item, fieldDelimiter);
+      segments.push(...lineSegs);
+    });
+  }
+
+  return segments;
+}
+
+function buildLineItem(item, fieldDelimiter) {
+  const segments = [];
+
+  const l5Seg = buildSegment('L5', [
+    '',
+    item.description || '',
+    item.commodityCode || '',
+    item.commodityCodeQualifier || '',
+    item.packagingCode || '',
+    item.ladingDescription || '',
+    item.weightQualifier || '',
+    item.hazardousMaterialCode || '',
+    item.nmfcCode || ''
+  ], fieldDelimiter);
+  segments.push(l5Seg);
+
+  if (item.weight) {
+    const at8Seg = buildSegment('AT8', [
+      item.weight.weightQualifier || '',
+      item.weight.weightUnitCode || '',
+      item.weight.weight || '',
+      '',
+      item.weight.ladingQuantity || ''
+    ], fieldDelimiter);
+    segments.push(at8Seg);
+  }
+
+  if (item.contact) {
+    const g61Seg = buildSegment('G61', [
+      item.contact.contactFunctionCode || '',
+      item.contact.name || '',
+      item.contact.communicationNumberQualifier || '',
+      item.contact.communicationNumber || ''
+    ], fieldDelimiter);
+    segments.push(g61Seg);
+  }
+
+  if (item.references) {
+    item.references.forEach(ref => {
+      const l11Seg = buildL11(ref, fieldDelimiter);
+      if (l11Seg) segments.push(l11Seg);
+    });
+  }
+
+  if (item.hazardousMaterial) {
+    const hm = item.hazardousMaterial;
+    const lh1Seg = buildSegment('LH1', [
+      hm.unitOrBasisForMeasurementCode || '',
+      hm.ladingQuantity || '',
+      hm.unOrNaIdNumber || '',
+      '', '', '', '', '', '',
+      hm.packingGroupCode || ''
+    ], fieldDelimiter);
+    segments.push(lh1Seg);
+
+    if (hm.hazardousClass) {
+      const lh2Seg = buildSegment('LH2', [
+        hm.hazardousClass || ''
+      ], fieldDelimiter);
+      segments.push(lh2Seg);
+    }
+
+    if (hm.properShippingName) {
+      const lh3Seg = buildSegment('LH3', [
+        hm.properShippingName || '',
+        hm.hazardousClassQualifier || '',
+        hm.nosIndicator || ''
+      ], fieldDelimiter);
+      segments.push(lh3Seg);
+    }
+
+    if (hm.hazardousMaterialDescription) {
+      const lfhSeg = buildSegment('LFH', [
+        hm.hazardousMaterialDescription.hazardousCode || '',
+        hm.hazardousMaterialDescription.hazardousDescription || ''
+      ], fieldDelimiter);
+      segments.push(lfhSeg);
+    }
+  }
+
+  return segments;
+}
+
+function buildL3(totals, fieldDelimiter) {
+  return buildSegment('L3', [
+    totals.weight || '',
+    totals.weightQualifier || '',
+    totals.freightRate || '',
+    totals.rateValueQualifier || '',
+    totals.charge || '',
+    '', '', '', '', '',
+    totals.ladingQuantity || ''
+  ], fieldDelimiter);
 }

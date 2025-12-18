@@ -76,3 +76,55 @@ export function parseInteger(value) {
   const num = parseInt(value, 10);
   return isNaN(num) ? null : num;
 }
+
+export const DATE_QUALIFIERS_REVERSE = Object.fromEntries(
+  Object.entries(DATE_QUALIFIERS).map(([k, v]) => [v, k])
+);
+
+export const STOP_REASON_CODES_REVERSE = Object.fromEntries(
+  Object.entries(STOP_REASON_CODES).map(([k, v]) => [v, k])
+);
+
+export const ENTITY_ID_CODES_REVERSE = Object.fromEntries(
+  Object.entries(ENTITY_ID_CODES).map(([k, v]) => [v, k])
+);
+
+export function getDateQualifierCode(name) {
+  return DATE_QUALIFIERS_REVERSE[name] || name;
+}
+
+export function getStopReasonCode(type) {
+  return STOP_REASON_CODES_REVERSE[type] || type;
+}
+
+export function getEntityIdCode(name) {
+  return ENTITY_ID_CODES_REVERSE[name] || name;
+}
+
+export function unformatDate(dateStr) {
+  if (!dateStr) return '';
+  const cleaned = dateStr.replace(/[-/]/g, '');
+  return cleaned;
+}
+
+export function unformatTime(timeStr) {
+  if (!timeStr) return '';
+  const cleaned = timeStr.replace(/:/g, '');
+  return cleaned.padStart(4, '0');
+}
+
+export function padLeft(str, length, char = ' ') {
+  str = String(str || '');
+  while (str.length < length) {
+    str = char + str;
+  }
+  return str;
+}
+
+export function padRight(str, length, char = ' ') {
+  str = String(str || '');
+  while (str.length < length) {
+    str = str + char;
+  }
+  return str;
+}
